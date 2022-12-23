@@ -5,6 +5,9 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics import calinski_harabasz_score, davies_bouldin_score, silhouette_score
 
 from time import time
+import warnings
+
+warnings.simplefilter('ignore', UserWarning)
 
 
 def umap_clustering_best(sample, df_data, n_clusters=20):
@@ -28,13 +31,13 @@ def umap_clustering_best(sample, df_data, n_clusters=20):
     s1 = silhouette_score(x_red, clustering.labels_, metric='euclidean')
     c1 = calinski_harabasz_score(x_red, clustering.labels_)
     d1 = davies_bouldin_score(x_red, clustering.labels_)
-    df_metrics = pd.DataFrame(data=[tf, s1, c1, d1],
+    df_metrics = pd.DataFrame(data=[[tf, s1, c1, d1]],
                               columns=['Time', 'Silhouette', 'CH score', 'DB score'])
     return df_metrics, df_clusters
 
 
 def assign_cluster_id(df_data, cluster_id):
-    print('Cluster ID')
+    print('\nAssign cluster ID')
     df_data['Cluster_ID'] = cluster_id.labels_
     return df_data
 

@@ -1,0 +1,17 @@
+joblib==1.2.0
+llvmlite==0.39.1
+MolVS==0.1.1
+numba==0.56.4
+numpy==1.23.5
+pandas==1.5.2
+Pillow==9.3.0
+pynndescent==0.5.8
+python-dateutil==2.8.2
+pytz==2022.7
+rdkit==2022.9.3
+scikit-learn==1.2.0
+scipy==1.9.3
+six==1.16.0
+threadpoolctl==3.1.0
+tqdm==4.64.1
+umap-learn==0.5.3
