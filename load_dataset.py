@@ -134,7 +134,7 @@ def check_output_folder(output_directory):
     return None
 
 
-def get_outlier_molelues(df_aux):
+def get_outlier_molecules(df_aux):
     df_tanimoto = pd.DataFrame(data=df_aux['NSC'])
     df_fps, fingerprints1 = get_mfp(df_smiles=df_aux)
     tanimoto_sims_vect = closest_distance_similarity(fingerprints1)
@@ -142,10 +142,10 @@ def get_outlier_molelues(df_aux):
     df_tanimoto['Tanimoto similarity'] = tanimoto_sims_vect
     df_tanimoto['outlier_05'] = np.where(df_tanimoto['Tanimoto similarity'] <= 0.5, True, False)
     df_new = df_aux.merge(df_tanimoto, on='NSC')
-    df_nonoutiers = df_new[df_new.loc[:, 'outlier_05'] == False]
-    print('\tNon-outlier molecules: ', len(df_nonoutiers))
-    df_fps_non, fingerprints_non = get_mfp(df_smiles=df_nonoutiers)
-    df_fps_non.insert(0, 'NSC', df_nonoutiers['NSC'])
+    df_nonoutliers = df_new[df_new.loc[:, 'outlier_05'] == False]
+    print('\tNon-outlier molecules: ', len(df_nonoutliers))
+    df_fps_non, fingerprints_non = get_mfp(df_smiles=df_nonoutliers)
+    df_fps_non.insert(0, 'NSC', df_nonoutliers['NSC'].values)
     return df_fps_non, fingerprints_non
 
 
@@ -154,9 +154,9 @@ def get_sample(df, outliers):
     col_name = ['MFP_' + str(i) for i in range(1024)]
     if outliers:
         print('\nRemoving outliers molecules...')
-        df_nonoutiers, fingerprints_non = get_outlier_molelues(df_aux)
-        nsc_col = df_nonoutiers['NSC']
-        df_fps_non, fingerprints_non = get_mfp(df_smiles=df_nonoutiers)
+        df_nonoutliers, fingerprints_non = get_outlier_molecules(df_aux)
+        nsc_col = df_nonoutliers['NSC']
+        df_fps_non, fingerprints_non = get_mfp(df_smiles=df_nonoutliers)
         df_fps_non.insert(0, 'NSC', nsc_col)
         df_sample = df_fps_non.loc[:, col_name]
         sample = df_sample.to_numpy()
@@ -187,10 +187,7 @@ def get_data_cluster(name_file_nci60, name_file_smi, dir_file, outliers):
     # MFP
     df_mfp_bits, fp1 = get_mfp(df_smiles=df_final)
     df_to_process_aux = df_final.merge(df_mfp_bits, how='left', left_on=['SMILE'], right_on=['SMILE'])
-    # Remove null smiles
     df_to_process = df_to_process_aux[df_to_process_aux.loc[:, 'SMILE'].notnull()]
-
-    # Remove null rows
     df_to_process.dropna(inplace=True)
 
     # Drop the cell lines with few data
